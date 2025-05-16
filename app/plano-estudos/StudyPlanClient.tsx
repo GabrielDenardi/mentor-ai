@@ -102,7 +102,7 @@ export default function StudyPlanClient({ subject }: { subject: string }) {
             }, {} as Record<string, boolean>)
             setExpandedDays(initial)
         }
-    }, [loadingPlan, studyPlan])
+    }, [loadingPlan])
 
     const toggleDay = (day: string) =>
         setExpandedDays((p) => ({ ...p, [day]: !p[day] }))
