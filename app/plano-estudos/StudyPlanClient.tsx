@@ -242,87 +242,120 @@ export default function StudyPlanClient({ subject }: { subject: string }) {
 
                             <CardContent className="p-0">
                                 <div className="divide-y dark:divide-gray-700">
-                                    {Object.entries(groupedPlan).map(([day, entries], dayIdx) => (
-                                        <div key={day}>
-                                            <motion.div
-                                                className="p-4 flex justify-between items-center cursor-pointer bg-white/80 dark:bg-gray-800/80"
-                                                onClick={() => toggleDay(day)}
-                                                initial={{ opacity: 0, y: -10 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                transition={{ duration: 0.2, delay: dayIdx * 0.05 }}
-                                            >
-                                                <div className="flex items-center">
-                                                    <CheckCircle className="h-6 w-6 mr-3 text-blue-500" />
-                                                    <h3 className="font-medium text-gray-800 dark:text-gray-200">
-                                                        {day}
-                                                    </h3>
-                                                </div>
-                                                <span className="text-sm text-blue-500">
-            {expandedDays[day] ? "▾" : "▸"}
-          </span>
-                                            </motion.div>
+                                    {Object.entries(groupedPlan).map(([day, entries], dayIdx) => {
+                                        const allCompleted = entries.every(item => item.completed)
 
-                                            <AnimatePresence initial={false}>
-                                                {expandedDays[day] && (
-                                                    <motion.div
-                                                        key="content"
-                                                        initial="collapsed"
-                                                        animate="open"
-                                                        exit="collapsed"
-                                                        variants={{
-                                                            open: { height: "auto", opacity: 1 },
-                                                            collapsed: { height: 0, opacity: 0 }
-                                                        }}
-                                                        transition={{ duration: 0.3, ease: "easeInOut" }}
-                                                        className="overflow-hidden"
-                                                    >
-                                                        {entries.map((item, idx) => (
-                                                            <motion.div
-                                                                key={item.id}
-                                                                className={`p-4 flex justify-between items-center cursor-pointer transition-colors duration-200 ${
-                                                                    item.completed
-                                                                        ? "bg-green-50/50 dark:bg-green-900/10"
-                                                                        : "hover:bg-blue-50/50 dark:hover:bg-blue-900/20"
-                                                                }`}
-                                                                initial={{ opacity: 0, x: -10 }}
-                                                                animate={{ opacity: 1, x: 0 }}
-                                                                transition={{ duration: 0.2, delay: idx * 0.03 }}
-                                                                onClick={() => toggleCompleted(item.id)}
-                                                            >
-                                                                <div className="flex items-center">
-                                                                    <CheckCircle
-                                                                        className={`h-6 w-6 mr-3 transition-all ${
-                                                                            item.completed
-                                                                                ? "fill-green-500 text-white"
-                                                                                : "fill-transparent text-blue-500"
-                                                                        }`}
-                                                                    />
-                                                                    <p
-                                                                        className={`${
-                                                                            item.completed
-                                                                                ? "line-through opacity-70 text-gray-400"
-                                                                                : "text-gray-600 dark:text-gray-400"
-                                                                        }`}
-                                                                    >
-                                                                        {item.content}
-                                                                    </p>
-                                                                </div>
-                                                                <span
-                                                                    className={`inline-flex flex-shrink-0 items-center justify-center whitespace-nowrap rounded-full text-sm shadow-sm text-white w-16 py-1 ${
-                                                                        item.completed
-                                                                            ? "bg-gray-400"
-                                                                            : "bg-gradient-to-r from-blue-400 to-blue-500 dark:from-blue-600 dark:to-blue-500"
-                                                                    }`}
+                                        return (
+                                            <div key={day}>
+                                                <motion.div
+                                                    className={`
+          p-4 flex justify-between items-center cursor-pointer
+          ${allCompleted
+                                                        ? 'bg-green-50 dark:bg-green-900/20'
+                                                        : 'bg-white/80 dark:bg-gray-800/80'
+                                                    }
+        `}
+                                                    onClick={() => toggleDay(day)}
+                                                    initial={{ opacity: 0, y: -10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ duration: 0.2, delay: dayIdx * 0.05 }}
+                                                >
+                                                    <div className="flex items-center">
+                                                        <CheckCircle
+                                                            className={`
+              h-6 w-6 mr-3 transition-all
+              ${allCompleted
+                                                                ? 'fill-green-500 text-white'
+                                                                : 'fill-transparent text-blue-500'
+                                                            }
+            `}
+                                                        />
+                                                        <h3
+                                                            className={`
+              font-medium
+              ${allCompleted
+                                                                ? 'text-green-700 dark:text-green-300'
+                                                                : 'text-gray-800 dark:text-gray-200'
+                                                            }
+            `}
+                                                        >
+                                                            {day}
+                                                        </h3>
+                                                    </div>
+                                                    <span className="text-sm text-blue-500">
+          {expandedDays[day] ? '▾' : '▸'}
+        </span>
+                                                </motion.div>
+
+                                                <AnimatePresence initial={false}>
+                                                    {expandedDays[day] && (
+                                                        <motion.div
+                                                            key="content"
+                                                            initial="collapsed"
+                                                            animate="open"
+                                                            exit="collapsed"
+                                                            variants={{
+                                                                open: { height: 'auto', opacity: 1 },
+                                                                collapsed: { height: 0, opacity: 0 },
+                                                            }}
+                                                            transition={{ duration: 0.3, ease: 'easeInOut' }}
+                                                            className="overflow-hidden"
+                                                        >
+                                                            {entries.map((item, idx) => (
+                                                                <motion.div
+                                                                    key={item.id}
+                                                                    className={`
+                  p-4 flex justify-between items-center cursor-pointer transition-colors duration-200
+                  ${item.completed
+                                                                        ? 'bg-green-50/50 dark:bg-green-900/10'
+                                                                        : 'hover:bg-blue-50/50 dark:hover:bg-blue-900/20'
+                                                                    }
+                `}
+                                                                    initial={{ opacity: 0, x: -10 }}
+                                                                    animate={{ opacity: 1, x: 0 }}
+                                                                    transition={{ duration: 0.2, delay: idx * 0.03 }}
+                                                                    onClick={() => toggleCompleted(item.id)}
                                                                 >
-                    {item.duration} min
-                  </span>
-                                                            </motion.div>
-                                                        ))}
-                                                    </motion.div>
-                                                )}
-                                            </AnimatePresence>
-                                        </div>
-                                    ))}
+                                                                    <div className="flex items-center">
+                                                                        <CheckCircle
+                                                                            className={`
+                      h-6 w-6 mr-3 transition-all
+                      ${item.completed
+                                                                                ? 'fill-green-500 text-white'
+                                                                                : 'fill-transparent text-blue-500'
+                                                                            }
+                    `}
+                                                                        />
+                                                                        <p
+                                                                            className={`
+                      ${item.completed
+                                                                                ? 'line-through opacity-70 text-gray-400'
+                                                                                : 'text-gray-600 dark:text-gray-400'
+                                                                            }
+                    `}
+                                                                        >
+                                                                            {item.content}
+                                                                        </p>
+                                                                    </div>
+                                                                    <span
+                                                                        className={`
+                    inline-flex flex-shrink-0 items-center justify-center whitespace-nowrap rounded-full text-sm shadow-sm text-white w-16 py-1
+                    ${item.completed
+                                                                            ? 'bg-gray-400'
+                                                                            : 'bg-gradient-to-r from-blue-400 to-blue-500 dark:from-blue-600 dark:to-blue-500'
+                                                                        }
+                  `}
+                                                                    >
+                  {item.duration} min
+                </span>
+                                                                </motion.div>
+                                                            ))}
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
+                                            </div>
+                                        )
+                                    })}
                                 </div>
                             </CardContent>
                         </Card>
