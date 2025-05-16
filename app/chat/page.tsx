@@ -67,7 +67,7 @@ export default function ChatScreen() {
           {
             id: 1,
             sender: "ai",
-            text: "Olá! Sou o MentorIA, seu assistente de estudos personalizado. Quantos dias faltam para sua prova? Em que matérias você tem mais dificuldade?",
+            text: "Olá! Sou o MentorIA, seu assistente de estudos personalizado. Em que matérias você tem mais dificuldade?",
           },
         ])
         setHasInitialMessage(true)
