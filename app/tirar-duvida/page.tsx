@@ -40,6 +40,7 @@ export default function TirarDuvidaScreen() {
   const [mounted, setMounted] = useState(false)
   const { resolvedTheme } = useTheme()
   const inputRef = useRef<HTMLInputElement>(null)
+  const [lastAI, setLastAI] = useState<string>("")
 
   useEffect(() => {
     setMounted(true)
@@ -76,37 +77,35 @@ export default function TirarDuvidaScreen() {
     }
   }
 
-  const sendMessage = (text: string) => {
-    const newMessage = { id: messages.length + 1, sender: "user", text }
-    setMessages((prev) => [...prev, newMessage])
+  const sendMessage = async (text: string) => {
+    const newMessage: Message = { id: messages.length + 1, sender: "user", text }
+    setMessages(prev => [...prev, newMessage])
     setIsTyping(true)
     setShowSuggestions(false)
 
-    setTimeout(() => {
-      setIsTyping(false)
+    try {
+      const res = await fetch("/api/tirar-duvida", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text }),
+      })
+      const { reply, error } = await res.json()
+      if (error) throw new Error(error)
 
-      if (text.toLowerCase().includes("derivada")) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: prev.length + 1,
-            sender: "ai",
-            text: "Derivada é como medir a velocidade de um carro a cada segundo. É usada para saber como uma coisa muda em relação a outra.\n\nPense assim: se você está dirigindo, o velocímetro mostra sua velocidade naquele instante exato - isso é uma derivada! Ele mostra como sua posição está mudando em relação ao tempo.\n\nNa matemática, escrevemos como f'(x) ou df/dx, que significa 'taxa de variação de f em relação a x'.\n\nPor exemplo, se f(x) = x², então f'(x) = 2x, que nos diz como a função está crescendo em cada ponto.",
-          },
-        ])
-        setShowExtendedOptions(true)
-      } else {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: prev.length + 1,
-            sender: "ai",
-            text: "Entendi sua dúvida! Vou explicar de forma simples:\n\n" + generateSimpleResponse(text),
-          },
-        ])
-        setShowExtendedOptions(true)
-      }
-    }, 2000)
+      setMessages(prev => [
+        ...prev,
+        { id: prev.length + 1, sender: "ai", text: reply }
+      ])
+      setLastAI(reply)
+    } catch (err: any) {
+      setMessages(prev => [
+        ...prev,
+        { id: prev.length + 1, sender: "ai", text: "Ocorreu um erro: " + err.message }
+      ])
+    } finally {
+      setIsTyping(false)
+      setShowExtendedOptions(true)
+    }
   }
 
   const generateSimpleResponse = (question: string) => {
@@ -127,37 +126,47 @@ export default function TirarDuvidaScreen() {
     }, 100)
   }
 
-  const handleExtendedOption = (option: string) => {
+  const handleExtendedOption = async (type: "simpler" | "example" | "quiz") => {
+    if (!lastAI) return
+
+    let instrucao = ""
+    if (type === "simpler") instrucao = "Reescreva este texto de forma bem simples:"
+    if (type === "example") instrucao = "Gere um exemplo do cotidiano para este texto:"
+    if (type === "quiz") instrucao = "Transforme este texto num quiz de 3 perguntas:"
+
+    const userMsg: Message = {
+      id: messages.length + 1,
+      sender: "user",
+      text: instrucao
+    }
+    setMessages(prev => [...prev, userMsg])
+
     setIsTyping(true)
     setShowExtendedOptions(false)
 
-    setTimeout(() => {
-      setIsTyping(false)
+    try {
+      const res = await fetch("/api/tirar-duvida", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: `${instrucao}\n\n${lastAI}` }),
+      })
+      const { reply, error } = await res.json()
+      if (error) throw new Error(error)
 
-      let responseText = ""
-
-      if (option === "simpler") {
-        responseText =
-          "Vamos simplificar ainda mais:\n\nDerivada é como ver quão rápido algo está mudando.\n\nSe você enche um balde com água, a derivada é quão rápido o nível da água está subindo.\n\nSe você anda de bicicleta, a derivada é sua velocidade - quão rápido sua posição muda.\n\nÉ basicamente uma forma matemática de medir 'quão rápido' algo está acontecendo em um momento específico."
-      } else if (option === "example") {
-        responseText =
-          "Aqui está um exemplo do cotidiano:\n\nQuando você esquenta água para fazer café, a temperatura sobe. A derivada é quão rápido essa temperatura está subindo a cada momento.\n\nNo início, a água esquenta rápido (derivada alta).\nDepois de um tempo, esquenta mais devagar (derivada menor).\nQuando começa a ferver, a temperatura para de subir (derivada zero).\n\nOutro exemplo: quando você freia o carro, a derivada da velocidade (que chamamos de aceleração) é negativa, mostrando que você está desacelerando."
-      } else if (option === "quiz") {
-        responseText =
-          "Vamos testar seu conhecimento com um mini-quiz sobre derivadas:\n\n1. Se uma função representa a posição de um objeto, o que sua derivada representa?\na) Velocidade\nb) Massa\nc) Temperatura\n\n2. Se f(x) = 3x², qual é f'(x)?\na) 6x\nb) 3x\nc) 9x²\n\n3. Quando a derivada de uma função é zero em um ponto, isso significa que:\na) A função está crescendo rapidamente\nb) A função não está mudando naquele ponto\nc) A função não existe naquele ponto\n\n(As respostas corretas são: 1-a, 2-a, 3-b)"
-      }
-
-      setMessages((prev) => [
+      setMessages(prev => [
         ...prev,
-        {
-          id: prev.length + 1,
-          sender: "ai",
-          text: responseText,
-        },
+        { id: prev.length + 1, sender: "ai", text: reply.trim() }
       ])
-
+      setLastAI(reply.trim())
+    } catch (err: any) {
+      setMessages(prev => [
+        ...prev,
+        { id: prev.length + 1, sender: "ai", text: "Erro: " + err.message }
+      ])
+    } finally {
+      setIsTyping(false)
       setShowExtendedOptions(true)
-    }, 2000)
+    }
   }
 
   if (!mounted) return null
