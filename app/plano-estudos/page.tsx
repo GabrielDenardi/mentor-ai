@@ -16,7 +16,7 @@ import {
   CheckCircle,
   RefreshCw,
   BookOpen,
-  Trophy,
+  Trophy, Calendar,
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -24,6 +24,9 @@ import { Progress } from "@/components/ui/progress"
 import Confetti from "@/components/confetti"
 import { PDFDownloadLink } from "@react-pdf/renderer"
 import { StudyPlanPDF } from "@/components/StudyPlanPDF"
+import { format, addDays, nextMonday, parseISO } from 'date-fns'
+import { useSession, signIn } from "next-auth/react"
+
 
 type StudyItem = {
   id: number
@@ -44,11 +47,41 @@ export default function StudyPlanScreen() {
   const [showConfetti, setShowConfetti] = useState(false)
   const [celebrationVisible, setCelebrationVisible] = useState(false)
   const [studyPlan, setStudyPlan] = useState<StudyItem[]>([])
+  const { data: session } = useSession();
+  const [addingToGoogle, setAddingToGoogle] = useState(false)
 
-  type GroupedEntry = {
-    content: string
-    duration: number
-    completed: boolean
+
+  async function handleAddToGoogle() {
+    if (!session) {
+      return signIn("google", { callbackUrl: window.location.href });
+    }
+
+    setAddingToGoogle(true)
+
+    try {
+      const startOfWeek = nextMonday(new Date())
+
+      const res = await fetch("/api/calendar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          plan: studyPlan,
+          startDate: startOfWeek.toISOString()
+        }),
+      })
+
+      if (!res.ok) {
+        const { error } = await res.json()
+        alert("Falha ao adicionar na agenda: " + error)
+      } else {
+        alert("Eventos adicionados ao seu Google Agenda!")
+      }
+    } catch (err) {
+      alert("Erro ao adicionar na agenda.")
+      console.error(err)
+    } finally {
+      setAddingToGoogle(false)
+    }
   }
 
   const groupedPlan: Record<string, StudyItem[]> = {}
@@ -384,6 +417,45 @@ export default function StudyPlanScreen() {
                 <BookOpen className="mr-2 h-5 w-5"/> Nova Matéria
               </Button>
             </Link>
+
+            <div className="col-span-full">
+              <Button
+                  className="w-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center gap-2 whitespace-nowrap"
+                  onClick={handleAddToGoogle}
+                  disabled={addingToGoogle}
+              >
+                {addingToGoogle ? (
+                    <>
+                      <svg
+                          className="animate-spin h-5 w-5 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                      >
+                        <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                        />
+                        <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                        />
+                      </svg>
+                      Adicionando...
+                    </>
+                ) : (
+                    <>
+                      <Calendar className="h-5 w-5" />
+                      Adicionar ao Google Agenda
+                    </>
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
