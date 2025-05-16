@@ -1,4 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { GoogleGenAI } from "@google/genai"
+
+const ai = new GoogleGenAI({
+    apiKey: process.env.GEMINI_API_KEY!,
+})
 
 export async function POST(request: NextRequest) {
     const { message } = (await request.json()) as { message: string }
@@ -17,24 +22,24 @@ Gere um cronograma de estudos para **7 dias** em JSON puro, no formato:
 Não inclua nenhum texto extra, só o array JSON.
   `.trim()
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`
+    try {
+        const response = await ai.models.generateContent({
+            model: "gemini-2.0-flash",
+            contents: [{ parts: [{ text: prompt }] }],
+        })
 
-    const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
-    })
-    if (!res.ok) {
-        const err = await res.text()
-        return NextResponse.json({ error: err }, { status: res.status })
+        let raw = response.candidates?.[0]?.content?.parts?.[0]?.text ?? '[]'
+        raw = raw.trim()
+            .replace(/^```(?:json)?\s*/im, '')
+            .replace(/```$/m, '')
+            .trim()
+
+        return NextResponse.json({
+            reply: "Pronto! Seu cronograma de estudos está aqui. Clique no botão abaixo para visualizar.",
+            plan: raw
+        })
+    } catch (err: any) {
+        console.error("Erro ao chamar o Gemini:", err)
+        return NextResponse.json({ error: err.message }, { status: 500 })
     }
-
-    const data = await res.json()
-    let raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? '[]'
-    raw = raw.trim().replace(/^```(?:json)?\s*/im, '').replace(/```$/m, '').trim()
-
-    return NextResponse.json({
-        reply: "Pronto! Seu cronograma de estudos está aqui. Clique no botão abaixo para visualizar.",
-        plan: raw
-    })
 }

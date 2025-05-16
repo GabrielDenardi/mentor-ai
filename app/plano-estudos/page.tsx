@@ -22,8 +22,6 @@ import { motion, AnimatePresence } from "framer-motion"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Progress } from "@/components/ui/progress"
 import Confetti from "@/components/confetti"
-import jsPDF from "jspdf"
-import html2canvas from "html2canvas"
 import { PDFDownloadLink } from "@react-pdf/renderer"
 import { StudyPlanPDF } from "@/components/StudyPlanPDF"
 
@@ -359,36 +357,31 @@ export default function StudyPlanScreen() {
           </AnimatePresence>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-            <Button asChild className="w-full">
-              <PDFDownloadLink
-                  document={<StudyPlanPDF plan={studyPlan} subject={subject} />}
-                  fileName={`Plano de ${subject}.pdf`}
-              >
-                {({ loading }) =>
-                    loading
-                        ? "Gerando PDF…"
-                        : (
-                            <>
-                              <Download className="mr-2 h-5 w-5" />
-                              Exportar PDF
-                            </>
-                        )
-                }
-              </PDFDownloadLink>
-            </Button>
+            <PDFDownloadLink
+                document={<StudyPlanPDF plan={studyPlan} subject={subject} />}
+                fileName={`Plano de ${subject}.pdf`}
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-md shadow-md hover:shadow-lg transition flex items-center justify-center gap-2"
+            >
+              {({ loading }) =>
+                  loading ? "Gerando PDF…" : (
+                      <>
+                        <Download className="h-5 w-5"/>
+                        Exportar PDF
+                      </>
+                  )
+              }
+            </PDFDownloadLink>
 
             <Button
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white shadow-md hover:shadow-lg transition-all duration-200 py-3"
+                className="w-full bg-gradient-to-r from-purple-500 to-pink-600 text-white"
                 onClick={resetPlan}
             >
-              <RefreshCw className="mr-2 h-5 w-5" />
-              Reiniciar
+              <RefreshCw className="mr-2 h-5 w-5"/> Reiniciar
             </Button>
 
-            <Link href="/chat" className="w-full">
-              <Button className="w-full bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white shadow-md hover:shadow-lg transition-all duration-200 py-3">
-                <BookOpen className="mr-2 h-5 w-5" />
-                Nova Matéria
+            <Link href="/chat">
+              <Button className="w-full bg-gradient-to-r from-blue-500 to-cyan-600 text-white">
+                <BookOpen className="mr-2 h-5 w-5"/> Nova Matéria
               </Button>
             </Link>
           </div>
