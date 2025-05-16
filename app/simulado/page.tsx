@@ -33,7 +33,6 @@ export default function SimuladoScreen() {
   useEffect(() => {
     setMounted(true)
 
-    // 1) tenta carregar do localStorage
     const stored = localStorage.getItem("mentor-simulado-questions")
     if (stored) {
       const parsed: Question[] = JSON.parse(stored)
@@ -43,7 +42,6 @@ export default function SimuladoScreen() {
       return
     }
 
-    // 2) se não tiver, tenta regenerar a partir dos tópicos
     const topics = localStorage.getItem("mentor-topics")
     if (topics) {
       fetch("/api/simulado", {
@@ -60,7 +58,6 @@ export default function SimuladoScreen() {
           .catch((err) => console.error("Erro ao gerar simulado:", err))
           .finally(() => setLoading(false))
     } else {
-      // sem tópicos, não há como gerar
       setLoading(false)
     }
   }, [])
