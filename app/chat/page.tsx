@@ -111,6 +111,18 @@ export default function ChatScreen() {
       localStorage.setItem("mentor-explanation", reply.trim())
       localStorage.setItem("mentor-topics", plan)
 
+      try {
+        const simuladoRes = await fetch("/api/simulado", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ topics: plan }),
+        })
+        const { questions } = await simuladoRes.json()
+        localStorage.setItem("mentor-simulado-questions", JSON.stringify(questions))
+      } catch (e) {
+        console.error("Erro ao gerar simulado:", e)
+      }
+
       setPlanJson(plan)
 
       setMessages(prev => [

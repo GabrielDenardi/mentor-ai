@@ -20,58 +20,11 @@ type Question = {
   explanation: string
 }
 
-const simuladoQuestions: Question[] = [
-  {
-    id: 1,
-    text: "Qual foi o período da Era Vargas no Brasil?",
-    options: ["1920-1940", "1930-1945", "1945-1960", "1950-1970"],
-    correctAnswer: 1,
-    explanation:
-      "A Era Vargas compreendeu o período de 1930 a 1945, quando Getúlio Vargas governou o Brasil de forma contínua.",
-  },
-  {
-    id: 2,
-    text: "Qual das seguintes grandezas é escalar?",
-    options: ["Velocidade", "Aceleração", "Força", "Temperatura"],
-    correctAnswer: 3,
-    explanation:
-      "Temperatura é uma grandeza escalar, pois é definida apenas por sua magnitude, sem direção ou sentido.",
-  },
-  {
-    id: 3,
-    text: "Qual é a fórmula da Segunda Lei de Newton?",
-    options: ["F = m.a", "E = m.c²", "F = G.(m₁.m₂)/d²", "v = d/t"],
-    correctAnswer: 0,
-    explanation:
-      "A Segunda Lei de Newton é expressa pela fórmula F = m.a, onde F é a força resultante, m é a massa e a é a aceleração.",
-  },
-  {
-    id: 4,
-    text: "Qual evento marcou o início da República Velha no Brasil?",
-    options: ["Independência do Brasil", "Proclamação da República", "Revolução de 1930", "Golpe Militar de 1964"],
-    correctAnswer: 1,
-    explanation:
-      "A República Velha iniciou-se com a Proclamação da República em 15 de novembro de 1889 e durou até a Revolução de 1930.",
-  },
-  {
-    id: 5,
-    text: "O que é energia potencial gravitacional?",
-    options: [
-      "Energia associada ao movimento de um corpo",
-      "Energia armazenada em um corpo devido à sua posição em um campo gravitacional",
-      "Energia liberada em reações nucleares",
-      "Energia térmica de um sistema",
-    ],
-    correctAnswer: 1,
-    explanation:
-      "Energia potencial gravitacional é a energia armazenada em um objeto devido à sua posição em um campo gravitacional, calculada por E = m.g.h.",
-  },
-]
-
 export default function SimuladoScreen() {
   const [mounted, setMounted] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [currentQuestion, setCurrentQuestion] = useState(0)
-  const [questions, setQuestions] = useState<Question[]>(simuladoQuestions)
+  const [questions, setQuestions] = useState<Question[]>([])
   const [showResults, setShowResults] = useState(false)
   const [score, setScore] = useState(0)
   const [answered, setAnswered] = useState(false)
@@ -79,29 +32,59 @@ export default function SimuladoScreen() {
 
   useEffect(() => {
     setMounted(true)
-    updateProgress()
-  }, [currentQuestion])
 
-  const updateProgress = () => {
-    setProgress(((currentQuestion + 1) / questions.length) * 100)
-  }
+    // 1) tenta carregar do localStorage
+    const stored = localStorage.getItem("mentor-simulado-questions")
+    if (stored) {
+      const parsed: Question[] = JSON.parse(stored)
+      setQuestions(parsed)
+      setProgress((1 / parsed.length) * 100)
+      setLoading(false)
+      return
+    }
+
+    // 2) se não tiver, tenta regenerar a partir dos tópicos
+    const topics = localStorage.getItem("mentor-topics")
+    if (topics) {
+      fetch("/api/simulado", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topics }),
+      })
+          .then((res) => res.json())
+          .then(({ questions }: { questions: Question[] }) => {
+            setQuestions(questions)
+            setProgress((1 / questions.length) * 100)
+            localStorage.setItem("mentor-simulado-questions", JSON.stringify(questions))
+          })
+          .catch((err) => console.error("Erro ao gerar simulado:", err))
+          .finally(() => setLoading(false))
+    } else {
+      // sem tópicos, não há como gerar
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!loading && questions.length > 0) {
+      setProgress(((currentQuestion + 1) / questions.length) * 100)
+    }
+  }, [currentQuestion, questions.length, loading])
 
   const handleAnswer = (optionIndex: number) => {
     if (answered) return
-
-    const updatedQuestions = [...questions]
-    updatedQuestions[currentQuestion].userAnswer = optionIndex
-    setQuestions(updatedQuestions)
+    const updated = [...questions]
+    updated[currentQuestion].userAnswer = optionIndex
+    setQuestions(updated)
     setAnswered(true)
-
     if (optionIndex === questions[currentQuestion].correctAnswer) {
-      setScore((prevScore) => prevScore + 1)
+      setScore((s) => s + 1)
     }
   }
 
   const nextQuestion = () => {
     if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1)
+      setCurrentQuestion((q) => q + 1)
       setAnswered(false)
     } else {
       setShowResults(true)
@@ -109,14 +92,35 @@ export default function SimuladoScreen() {
   }
 
   const resetSimulado = () => {
-    const resetQuestions = questions.map((q) => ({ ...q, userAnswer: undefined }))
-    setQuestions(resetQuestions)
+    localStorage.removeItem("mentor-simulado-questions")
+    const reset = questions.map((q) => ({ ...q, userAnswer: undefined }))
+    setQuestions(reset)
     setCurrentQuestion(0)
     setShowResults(false)
     setScore(0)
     setAnswered(false)
-    setProgress(20)
+    setProgress((1 / reset.length) * 100)
   }
+
+  if (!mounted || loading) {
+    return (
+        <div className="flex items-center justify-center h-screen">
+          <p>Gerando simulado…</p>
+        </div>
+    )
+  }
+
+  if (questions.length === 0) {
+    return (
+        <div className="p-6 text-center">
+          <p>Não há simulado disponível. Volte ao chat para gerar um plano primeiro.</p>
+          <Link href="/chat">
+            <Button className="mt-4">Voltar ao chat</Button>
+          </Link>
+        </div>
+    )
+  }
+
 
   if (!mounted) return null
 
