@@ -72,6 +72,12 @@ export default function StudyPlanScreen() {
 
       if (!res.ok) {
         const { error } = await res.json()
+
+        if (error === "Invalid Credentials" || res.status === 401) {
+          alert("Sua sessão expirou. Faça login novamente.")
+          return signIn("google", { callbackUrl: window.location.href })
+        }
+
         alert("Falha ao adicionar na agenda: " + error)
       } else {
         alert("Eventos adicionados ao seu Google Agenda!")

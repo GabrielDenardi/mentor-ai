@@ -108,6 +108,9 @@ export default function ChatScreen() {
       setIsTyping(false)
       if (error) throw new Error(error)
 
+      localStorage.setItem("mentor-explanation", reply.trim())
+      localStorage.setItem("mentor-topics", plan)
+
       setPlanJson(plan)
 
       setMessages(prev => [
@@ -285,7 +288,7 @@ export default function ChatScreen() {
               <span>Tirar dúvida</span>
             </Button>
           </Link>
-          <Link href="/conteudo" className="w-full">
+          <Link href={`/conteudo?subject=${encodeURIComponent(subject)}`} className="w-full">
             <Button className="w-full bg-purple-100 hover:bg-purple-200 dark:bg-purple-900/40 dark:hover:bg-purple-800/60 text-purple-700 dark:text-purple-300 hover:scale-105 transition-transform duration-200 flex items-center justify-center gap-2 shadow-sm dark:shadow-gray-900/30">
               <BookOpen className="h-4 w-4" />
               <span>Revisar conteúdos</span>
