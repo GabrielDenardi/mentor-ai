@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { ArrowLeft, CheckCircle, XCircle, RefreshCw, BookOpen } from "lucide-react"
+import {ArrowLeft, CheckCircle, XCircle, RefreshCw, BookOpen, Shuffle} from "lucide-react"
 import { motion } from "framer-motion"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
@@ -97,6 +97,29 @@ export default function SimuladoScreen() {
     setScore(0)
     setAnswered(false)
     setProgress((1 / reset.length) * 100)
+  }
+
+  const generateNewQuestions = () => {
+    setLoading(true)
+    localStorage.removeItem("mentor-simulado-questions")
+    const topics = localStorage.getItem("mentor-topics")!
+    fetch("/api/simulado", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ topics }),
+    })
+        .then(res => res.json())
+        .then(({ questions: newQs }: { questions: Question[] }) => {
+          setQuestions(newQs)
+          localStorage.setItem("mentor-simulado-questions", JSON.stringify(newQs))
+          setCurrentQuestion(0)
+          setScore(0)
+          setAnswered(false)
+          setShowResults(false)
+          setProgress((1 / newQs.length) * 100)
+        })
+        .catch(err => console.error(err))
+        .finally(() => setLoading(false))
   }
 
   if (!mounted || loading) {
@@ -322,17 +345,35 @@ export default function SimuladoScreen() {
                 </div>
               </CardContent>
 
-              <CardFooter className="p-4 bg-gray-50 dark:bg-gray-800/50 flex justify-between">
+              <CardFooter className="
+  p-4
+  bg-gray-50 dark:bg-gray-800/50
+  flex flex-col sm:flex-row
+  items-stretch sm:items-center
+  space-y-2 sm:space-y-0 sm:justify-between
+">
                 <Link href="/chat">
-                  <Button variant="outline">Voltar ao chat</Button>
+                  <Button variant="outline" className="w-full sm:w-auto">
+                    Voltar ao chat
+                  </Button>
                 </Link>
-                <Button
-                  onClick={resetSimulado}
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 dark:from-blue-600 dark:to-purple-700 dark:hover:from-blue-500 dark:hover:to-purple-600 text-white"
-                >
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                  Refazer simulado
-                </Button>
+
+                <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0 w-full sm:w-auto">
+                  <Button
+                      onClick={generateNewQuestions}
+                      className="bg-green-500 hover:bg-green-600 text-white flex items-center justify-center w-full sm:w-auto"
+                  >
+                    <Shuffle className="mr-2 h-4 w-4" />
+                    Gerar novas perguntas
+                  </Button>
+                  <Button
+                      onClick={resetSimulado}
+                      className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white flex items-center justify-center w-full sm:w-auto"
+                  >
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Refazer simulado
+                  </Button>
+                </div>
               </CardFooter>
             </Card>
           </motion.div>
