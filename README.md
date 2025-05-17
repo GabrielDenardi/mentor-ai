@@ -66,7 +66,7 @@ Tudo isso em uma interface fluida, bonita e intuitiva — pensada para que você
 - **TypeScript**  
 - **Node.js**  
 - **Tailwind CSS**  
-- Integrações com APIs de IA (OpenAI / Gemini)  
+- Integrações com APIs de IA (Gemini)  
 - Integração com Google Agenda via OAuth
 
 ---
