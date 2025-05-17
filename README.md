@@ -45,7 +45,7 @@ Tudo isso em uma interface fluida, simples e pensada para deixar o aluno **no co
 
 - **Simulados**  
   - Realize quizzes e simulados (múltipla escolha ou discursivas).  
-  - Receba pontuação e feedback imediato para identificar pontos fortes e fracos.
+  - Feedback imediato para identificar pontos fortes e fracos.
 
 ---
 
