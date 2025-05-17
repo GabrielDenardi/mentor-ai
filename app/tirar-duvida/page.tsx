@@ -11,6 +11,8 @@ import { ArrowLeft, Send, Scissors, Lightbulb, CheckSquare, Sparkles } from "luc
 import { motion, AnimatePresence } from "framer-motion"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { useTheme } from "next-themes"
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 type Message = {
   id: number
@@ -106,10 +108,6 @@ export default function TirarDuvidaScreen() {
       setIsTyping(false)
       setShowExtendedOptions(true)
     }
-  }
-
-  const generateSimpleResponse = (question: string) => {
-    return "Este conceito é fundamental para entender como as coisas funcionam no mundo. Pense nele como uma ferramenta que nos ajuda a resolver problemas e entender fenômenos.\n\nNo dia a dia, você pode observar exemplos como quando observa mudanças no clima ou quando calcula quanto tempo levará para chegar a um destino.\n\nA aplicação prática deste conhecimento está em várias áreas, desde engenharia até economia e ciências naturais."
   }
 
   const handleSuggestedQuestion = (question: string) => {
@@ -284,12 +282,14 @@ export default function TirarDuvidaScreen() {
                     : "bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-gray-800 dark:text-gray-200 rounded-tl-none shadow-md dark:shadow-gray-900/30"
                 }`}
               >
-                {message.text.split("\n").map((line, i) => (
-                  <React.Fragment key={i}>
-                    {line}
-                    {i < message.text.split("\n").length - 1 && <br />}
-                  </React.Fragment>
-                ))}
+                <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      p: ({node, ...props}) => <p className="leading-relaxed" {...props} />,
+                    }}
+                >
+                  {message.text}
+                </ReactMarkdown>
               </div>
             </motion.div>
           ))}
