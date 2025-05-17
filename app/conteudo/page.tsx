@@ -7,6 +7,8 @@ import { ArrowLeft, Lightbulb, CheckSquare, Scissors } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { ThemeToggle } from "@/components/theme-toggle"
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 type PlanItem = { day: string; content: string; duration: number }
 type Topic    = { topic: string; explanation: string }
@@ -108,9 +110,17 @@ export default function ContentScreen() {
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="p-6">
-                                    <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.2 }} className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6 text-sm sm:text-base">
-                                        {contents[activeTab].explanation}
-                                    </motion.p>
+                                    <motion.div
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ duration: 0.5, delay: 0.2 }}
+                                        className="prose prose-sm dark:prose-invert leading-relaxed mb-6 max-w-none"
+                                    >
+                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                            {contents[activeTab].explanation}
+                                        </ReactMarkdown>
+                                    </motion.div>
+
 
                                     <div className="relative mb-4">
                                         <div className="flex overflow-x-auto space-x-3 py-1 no-scrollbar">
@@ -132,9 +142,18 @@ export default function ContentScreen() {
                                     </div>
 
                                     {example && (
-                                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <motion.div
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            transition={{ delay: 0.2 }}
+                                            className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                                        >
                                             <h3 className="font-semibold mb-2">Exemplo:</h3>
-                                            <p className="text-gray-700 dark:text-gray-300 text-sm sm:text-base whitespace-pre-wrap">{example}</p>
+                                            <div className="prose prose-sm dark:prose-invert">
+                                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                                    {example}
+                                                </ReactMarkdown>
+                                            </div>
                                         </motion.div>
                                     )}
                                 </CardContent>
