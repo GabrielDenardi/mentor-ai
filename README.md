@@ -26,7 +26,8 @@ Tudo isso em uma interface fluida, bonita e intuitiva — pensada para que você
 
 ## 🔍 Demonstração
 
-> _Insira aqui uma captura de tela da aplicação ou um link para uma demo online._
+👉 Acesse agora: [https://mentor-ai-ten.vercel.app](https://mentor-ai-ten.vercel.app)  
+🎥 Em breve: vídeo demonstrando a aplicação em funcionamento
 
 ---
 
