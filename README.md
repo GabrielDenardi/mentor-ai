@@ -1,16 +1,26 @@
-# Mentor AI 📚🤖
+# Mentor AI 📚🤖  
+**Seu estudo com IA, do seu jeito — mas como nunca foi antes.**
 
-Seu estudo com IA, do seu jeito.
+O **Mentor AI** não é apenas mais um chatbot educacional.  
+É um **mentor digital de verdade**, feito para quem se sente perdido em meio a tanto conteúdo ou frustrado com métodos que não funcionam.
 
-O **Mentor AI** não é apenas mais um chatbot educacional — é um verdadeiro mentor digital. Desenvolvido para alunos que se sentem perdidos diante de tantos conteúdos ou simplesmente querem estudar com foco, clareza e organização, o Mentor AI entende **o que você precisa aprender** e **como você prefere aprender**.
+A partir de um bate-papo com a IA, você recebe **um plano de estudos realmente personalizado**, feito para o seu jeito de aprender. Com tarefas organizadas em um **checklist interativo**, integração com o **Google Agenda**, exportação para **PDF**, além de **resumos, exemplos do cotidiano, quizzes e simulados**, o Mentor AI coloca você no controle do próprio aprendizado.
 
-A partir de um bate-papo com a IA, você recebe um **plano de estudos personalizado**, com tarefas organizadas em uma checklist interativa que você pode acompanhar, exportar em PDF, integrar ao Google Agenda e ainda receber **resumos, exemplos cotidianos, quizzes e simulados** sobre os assuntos que mais importam pra você.
+> 🎯 Quer foco? Ele entrega.  
+> 💬 Teve dúvida? A IA explica, reexplica, exemplifica e ainda gera quiz.  
+> 🎉 Concluiu uma tarefa? Vai chover confetes. Porque cada passo importa.  
+> ⏳ Cansado de promessas genéricas? Aqui, você estuda com propósito, clareza e uma pitada de diversão.
 
-🎉 Concluiu uma tarefa? Vai chover confetes.  
-❓ Teve uma dúvida? A IA pode explicar de outra forma, exemplificar e ainda te testar.  
-Tudo isso em uma interface fluida, simples e pensada para deixar o aluno **no controle do próprio aprendizado**.
+### ✨ O diferencial
 
-> Chega de promessas genéricas. Aqui, você estuda com propósito, foco e uma pitada de diversão.
+O Mentor AI une **tecnologia de ponta** com **pedagogia aplicada**. Não estamos falando de um assistente genérico:  
+- Ele **entende o que você precisa aprender**,  
+- **como você prefere aprender**,  
+- e **ajusta o caminho com base nas suas interações**.
+
+Tudo isso em uma interface fluida, bonita e intuitiva — pensada para que você aprenda mais e se preocupe menos.
+
+> **Estudar nunca foi tão humano.**
 
 ---
 
